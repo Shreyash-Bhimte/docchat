@@ -1,0 +1,37 @@
+# Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+*.egg-info/
+
+# Environments
+backend/venv/
+.conda/
+
+# Secrets — NEVER commit these
+backend/.env
+.env
+
+# Project-specific folders
+backend/uploads/
+backend/chroma_db/
+backend/vector_store/
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Frontend
+node_modules/
+frontend/dist/
+frontend/.env
