@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.document import Document
 from app.services.ingest import process_pdf
+from app.services.embeddings import embed_and_store
 from app.core.config import settings
 
 router = APIRouter(prefix="/upload", tags=["upload"])
@@ -23,11 +24,7 @@ async def upload_pdf(file: UploadFile = File(...), db: Session = Depends(get_db)
         shutil.copyfileobj(file.file, buffer)
 
     chunks = process_pdf(filepath)
-
-    for i, chunk in enumerate(chunks[:3]):
-        print(f"\n--- Chunk {i+1} (page {chunk['page_num']}) ---")
-        print(chunk["text"][:200])
-
+    
     doc = Document(
         filename=file.filename,
         filepath=filepath,
@@ -36,6 +33,8 @@ async def upload_pdf(file: UploadFile = File(...), db: Session = Depends(get_db)
     db.add(doc)
     db.commit()
     db.refresh(doc)
+
+    embed_and_store(doc.id, chunks)
 
     return {
         "doc_id": doc.id,
