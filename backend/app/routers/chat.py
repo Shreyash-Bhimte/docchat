@@ -35,22 +35,35 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db)):
     if not chunks:
         raise HTTPException(status_code=404, detail="No relevant chunks found")
 
+    history = db.query(ChatHistory).filter(
+        ChatHistory.doc_id == request.doc_id
+    ).order_by(ChatHistory.created_at.asc()).limit(3).all()
+
+    history_list = [
+        {"question": h.question, "answer": h.answer}
+        for h in history
+    ]
+
+    citations = [
+        {"page_num": c["page_num"], "similarity": c["similarity"]}
+        for c in chunks
+    ]
+
     full_answer = []
-    citations = [{"page_num": c["page_num"], "similarity": c["similarity"]} for c in chunks]
 
     def generate():
-        for token in stream_answer(request.question, chunks):
+        for token in stream_answer(request.question, chunks, history_list):
             full_answer.append(token)
             yield token
 
         answer_text = "".join(full_answer)
-        history = ChatHistory(
+        history_entry = ChatHistory(
             doc_id=request.doc_id,
             question=request.question,
             answer=answer_text,
             citations=json.dumps(citations)
         )
-        db.add(history)
+        db.add(history_entry)
         db.commit()
 
     return StreamingResponse(generate(), media_type="text/plain")
