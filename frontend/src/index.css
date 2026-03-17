@@ -34,6 +34,15 @@ body {
 .upload-btn:hover { background: #6070ee; }
 .upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .doc-list { display: flex; flex-direction: column; gap: 0.4rem; overflow-y: auto; }
+.doc-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.doc-item-row .doc-item {
+  flex: 1;
+  min-width: 0;
+}
 .doc-item {
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
@@ -48,6 +57,17 @@ body {
 .doc-item:hover { background: #2d3148; color: #e2e8f0; }
 .doc-item.active { background: #2d3148; border-color: #7c8cff; color: #e2e8f0; }
 .no-docs { font-size: 0.8rem; color: #4a5568; text-align: center; margin-top: 1rem; }
+.delete-btn {
+  background: none;
+  border: none;
+  color: #4a5568;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.delete-btn:hover { color: #fc8181; background: #2d1f1f; }
 
 /* Chat area */
 .chat-area {

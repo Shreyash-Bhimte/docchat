@@ -47,6 +47,21 @@ export default function App() {
     setMessages([]);
   }
 
+  async function deleteDoc(docId, e) {
+    e.stopPropagation();
+    if (!confirm("Delete this document?")) return;
+    try {
+      await axios.delete(`${API}/documents/${docId}`);
+      await fetchDocs();
+      if (selectedDoc === docId) {
+        setSelectedDoc(null);
+        setMessages([]);
+      }
+    } catch (err) {
+      alert("Delete failed: " + (err.response?.data?.detail || err.message));
+    }
+  }
+
   async function sendMessage() {
     if (!input.trim() || !selectedDoc || loading) return;
     const question = input.trim();
@@ -54,7 +69,7 @@ export default function App() {
     setMessages(prev => [...prev, { role: "user", content: question }]);
     setLoading(true);
 
-    const assistantMsg = { role: "assistant", content: "", citations: [] };
+    const assistantMsg = { role: "assistant", content: "" };
     setMessages(prev => [...prev, assistantMsg]);
 
     try {
@@ -102,13 +117,21 @@ export default function App() {
         <div className="doc-list">
           {docs.length === 0 && <p className="no-docs">No documents yet</p>}
           {docs.map(doc => (
-            <div
-              key={doc.doc_id}
-              className={`doc-item ${doc.doc_id === selectedDoc ? "active" : ""}`}
-              onClick={() => selectDoc(doc.doc_id)}
-              title={doc.filename}
-            >
-              📄 {doc.filename}
+            <div key={doc.doc_id} className="doc-item-row">
+              <div
+                className={`doc-item ${doc.doc_id === selectedDoc ? "active" : ""}`}
+                onClick={() => selectDoc(doc.doc_id)}
+                title={doc.filename}
+              >
+                📄 {doc.filename}
+              </div>
+              <button
+                className="delete-btn"
+                onClick={(e) => deleteDoc(doc.doc_id, e)}
+                title="Delete"
+              >
+                ✕
+              </button>
             </div>
           ))}
         </div>
@@ -125,7 +148,9 @@ export default function App() {
           : <div className="messages">
               {messages.map((msg, i) => (
                 <div key={i} className={`message ${msg.role}`}>
-                  <div className="bubble">{msg.content || "▍"}</div>
+                  <div className="bubble">
+                    {msg.role === "assistant" && !msg.content ? "▍" : msg.content}
+                  </div>
                 </div>
               ))}
               <div ref={bottomRef} />
