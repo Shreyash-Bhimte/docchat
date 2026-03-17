@@ -1,16 +1,24 @@
 import chromadb
 from sentence_transformers import SentenceTransformer
-from app.core.config import settings
 
-# load model once at startup — not on every request
-model = SentenceTransformer('all-MiniLM-L6-v2')
+_model = None
+_chroma_client = None
 
-# persistent chromadb — saves to disk so vectors survive restarts
-chroma_client = chromadb.PersistentClient(path="chroma_db")
+def get_model():
+    global _model
+    if _model is None:
+        _model = SentenceTransformer('all-MiniLM-L6-v2')
+    return _model
+
+def get_chroma_client():
+    global _chroma_client
+    if _chroma_client is None:
+        _chroma_client = chromadb.PersistentClient(path="chroma_db")
+    return _chroma_client
 
 
 def get_or_create_collection(doc_id: int):
-    return chroma_client.get_or_create_collection(
+    return get_chroma_client().get_or_create_collection(
         name=f"doc_{doc_id}",
         metadata={"hnsw:space": "cosine"}
     )
@@ -18,6 +26,7 @@ def get_or_create_collection(doc_id: int):
 
 def embed_and_store(doc_id: int, chunks: list[dict]):
     collection = get_or_create_collection(doc_id)
+    model = get_model()
 
     texts = [chunk["text"] for chunk in chunks]
     embeddings = model.encode(texts, batch_size=32, show_progress_bar=True)
@@ -39,6 +48,7 @@ def embed_and_store(doc_id: int, chunks: list[dict]):
 
 def retrieve_chunks(doc_id: int, query: str, k: int = 5) -> list[dict]:
     collection = get_or_create_collection(doc_id)
+    model = get_model()
 
     query_embedding = model.encode([query])[0].tolist()
 
