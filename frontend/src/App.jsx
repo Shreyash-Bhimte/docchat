@@ -79,6 +79,11 @@ export default function App() {
         body: JSON.stringify({ doc_id: selectedDoc, question }),
       });
 
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Server error");
+      }
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let text = "";
@@ -96,7 +101,11 @@ export default function App() {
     } catch (err) {
       setMessages(prev => {
         const updated = [...prev];
-        updated[updated.length - 1] = { role: "assistant", content: "Error: " + err.message };
+        updated[updated.length - 1] = {
+          role: "assistant",
+          content: "⚠️ Something went wrong. Make sure the backend is running and try again.",
+          isError: true
+        };
         return updated;
       });
     } finally {
@@ -148,7 +157,7 @@ export default function App() {
           : <div className="messages">
               {messages.map((msg, i) => (
                 <div key={i} className={`message ${msg.role}`}>
-                  <div className="bubble">
+                  <div className={`bubble ${msg.isError ? "error" : ""}`}>
                     {msg.role === "assistant" && !msg.content ? "▍" : msg.content}
                   </div>
                 </div>
@@ -172,4 +181,4 @@ export default function App() {
       </div>
     </div>
   );
-}
+}   

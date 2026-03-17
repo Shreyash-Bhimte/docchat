@@ -102,6 +102,11 @@ body {
 }
 .message.user .bubble { background: #7c8cff; color: white; border-radius: 12px 12px 2px 12px; }
 .message.assistant .bubble { background: #1a1d27; border: 1px solid #2d3148; border-radius: 12px 12px 12px 2px; }
+.bubble.error {
+  border-color: #fc8181;
+  color: #fc8181;
+  background: #2d1f1f;
+}
 .citations { font-size: 0.75rem; color: #4a90d9; }
 
 /* Input */
