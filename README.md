@@ -2,8 +2,9 @@
 
 A RAG-based PDF chatbot that lets you upload any PDF and ask questions about it. Get AI-powered answers with page citations, streamed in real time.
 
-**Live Demo:** https://docchat-api-vore.onrender.com/docs
+**Live Demo:** https://docchat-inky.vercel.app
 
+**API Docs:** https://docchat-api-vore.onrender.com/docs
 ---
 
 ## How it works
