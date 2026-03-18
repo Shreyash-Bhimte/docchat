@@ -10,7 +10,10 @@ app = FastAPI(title="DocChat API", version="0.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+    "http://localhost:5173",
+    "https://docchat-inky.vercel.app",  # replace with your actual Vercel URL
+    ],    
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
