@@ -66,8 +66,19 @@ async def chat(request: ChatRequest, db: Session = Depends(get_db)):
         db.add(history_entry)
         db.commit()
 
-    return StreamingResponse(generate(), media_type="text/plain")
+    # return StreamingResponse(generate(), media_type="text/plain")
+    answer = "".join(list(stream_answer(request.question, chunks, history_list)))
 
+    history_entry = ChatHistory(
+        doc_id=request.doc_id,
+        question=request.question,
+        answer=answer,
+        citations=json.dumps(citations)
+    )
+    db.add(history_entry)
+    db.commit()
+
+    return {"answer": answer, "citations": citations}
 
 @router.get("/history/{doc_id}")
 def get_history(doc_id: int, db: Session = Depends(get_db)):

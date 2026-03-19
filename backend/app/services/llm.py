@@ -37,18 +37,31 @@ def build_prompt(question: str, chunks: list[dict], history: list[dict] = []) ->
     return messages
 
 
+# def stream_answer(question: str, chunks: list[dict], history: list[dict] = []):
+#     messages = build_prompt(question, chunks, history)
+
+#     stream = client.chat.completions.create(
+#         model="llama-3.3-70b-versatile",
+#         messages=messages,
+#         temperature=0.1,
+#         max_tokens=1024,
+#         stream=True
+#     )
+
+#     for chunk in stream:
+#         delta = chunk.choices[0].delta.content
+#         if delta:
+#             yield delta
+
 def stream_answer(question: str, chunks: list[dict], history: list[dict] = []):
     messages = build_prompt(question, chunks, history)
 
-    stream = client.chat.completions.create(
+    response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=messages,
         temperature=0.1,
-        max_tokens=1024,
-        stream=True
+        max_tokens=512
     )
 
-    for chunk in stream:
-        delta = chunk.choices[0].delta.content
-        if delta:
-            yield delta
+    answer = response.choices[0].message.content
+    yield answer
