@@ -12,7 +12,7 @@ from app.core.config import settings
 router = APIRouter(prefix="/upload", tags=["upload"])
 
 MAX_FILE_SIZE_MB = 5
-MAX_CHUNKS = 150
+MAX_CHUNKS = 50
 
 
 @router.post("/")
@@ -57,7 +57,8 @@ async def upload_pdf(file: UploadFile = File(...), db: Session = Depends(get_db)
     embed_and_store(doc.id, chunks)
 
     gc.collect()
-
+    print(f"Chunks: {len(chunks)}")
+    
     return {
         "doc_id": doc.id,
         "filename": doc.filename,

@@ -108,7 +108,7 @@ def embed_and_store(doc_id: int, chunks: list[dict]):
     collection = get_or_create_collection(doc_id)
     model = get_model()
 
-    batch_size = 8   # 🔥 reduced batch size (IMPORTANT)
+    batch_size = 4   # 🔥 reduced batch size (IMPORTANT)
 
     total = 0
 
